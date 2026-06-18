@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WxBeacon2 Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      -webkit-app-region: drag;
+      user-select: none;
+      background: #0000;
+      color: #fff;
+      font-family: 'JF-Dot-Kappa-20-0213-Bold';
+    }
+    .wxbeacon2 {
+      box-sizing: border-box;
+      text-align: center;
+      width: 130px;
+      padding: 6px;
+      border: solid 1px #666;
+      border-radius: 11px;
+      background: #000d;
+    }
+    .title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #ccc;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .item {
+      margin: 10px 0;
+    }
+    .itemtitle {
+      text-align: start;
+      font-size: 15px;
+      margin-bottom: 3px;
+      margin-left: 10px;
+      color: #ddd;
+    }
+    .data {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+    .datavalue {
+      font-size: 19px;
+      color: #f9f9f9;
+    }
+    .dataunit {
+      font-size: 15px;
+      margin: 0 4px;
+      color: #eee;
+    }
+    .attr {
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="wxbeacon2">
+    <div class="title" id="labelname">EnvSensor</div>
+    <div class="itemlist">
+      <div class="item">
+        <div class="itemtitle">Temperature</div>
+        <div class="data"><div class="datavalue" id="temperature">----</div><div class="dataunit">℃</div></div>
+      </div>
+      <div class="item">
+        <div class="itemtitle">Humidity</div>
+        <div class="data"><div class="datavalue" id="humidity">----</div><div class="dataunit">％</div></div>
+      </div>
+      <div class="item">
+        <div class="itemtitle">Pressure</div>
+        <div class="data"><div class="datavalue" id="pressure">----</div><div class="dataunit">hPa</div></div>
+      </div>
+      <div class="item">
+        <div class="itemtitle">WBGT</div>
+        <div class="data"><div class="datavalue" id="wbgt">----</div><div class="dataunit"></div></div>
+      </div>
+      <div class="item">
+        <div class="itemtitle">UV Index</div>
+        <div class="data"><div class="datavalue" id="uvindex">----</div><div class="dataunit"></div></div>
+      </div>
+    </div>
+    <div class="attr"><div>WxBeacon2 - <span id="battery">-----</span> V</div></div>
+  </div>
+</main>
+</body>
+<script>
+const Elements = {
+  id: {
+    temperature: document.getElementById("temperature"),
+    humidity: document.getElementById("humidity"),
+    pressure: document.getElementById("pressure"),
+    wbgt: document.getElementById("wbgt"),
+    uvindex: document.getElementById("uvindex"),
+    battery: document.getElementById("battery"),
+    labelname: document.getElementById("labelname"),
+  }
+};
+function writeData (data){
+  Elements.id.temperature.textContent = data.temperature.toFixed(2);
+  Elements.id.humidity.textContent = data.humidity.toFixed(2);
+  Elements.id.pressure.textContent = data.pressure.toFixed(1);
+  Elements.id.wbgt.textContent = data.wbgt.toFixed(2);
+  Elements.id.uvindex.textContent = data.uvIndex.toFixed(2);
+  Elements.id.battery.textContent = data.battery.toFixed(3);
+}
+function changeLabel (label){
+  Elements.id.labelname.textContent = label;
+}
+(async () => {
+  ContentBridge.on("wxdata", (sender, data) => { writeData(data); });
+  ContentBridge.on("changelabel", (sender, data) => { changeLabel(data); });
+  writeData(await ContentBridge.getLatestWxData());
+  changeLabel(await ContentBridge.getLabelName());
+})();
+</script>
+</html>

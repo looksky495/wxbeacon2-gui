@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WxBeacon2 History</title>
+  <script src="./Chart.min.js"></script>
+  <style>
+    body {
+      background-color: #333;
+      color: #fff;
+    }
+    #itemBox, #modBox {
+      display: flex;
+      width: 100%;
+    }
+    #itemBox > button, #modBox > button {
+      flex: 1;
+      background: #555;
+      color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <div><canvas id="dataChart"></canvas></div>
+  <div id="itemBox"></div>
+  <div id="modBox"><button id="allClear">履歴を削除</button><button id="downloadData">履歴を保存（JSON）</button></div>
+</body>
+<script>
+const Elements = {
+  id: {
+    itemBox: document.getElementById("itemBox"),
+    allClear: document.getElementById("allClear"),
+    downloadData: document.getElementById("downloadData")
+  }
+};
+
+Chart.defaults.global.defaultFontColor = "#bbb";
+const dataChart = new Chart(document.getElementById("dataChart"), {
+  type: "line",
+  data: {
+    labels: ["Item 0"],
+    datasets: [
+      {
+        label: "Temperature (℃)",
+        data: [],
+        backgroundColor: "#222",
+        borderColor: "#888"
+      }
+    ]
+  }
+});
+const itemID = ["temperature", "humidity", "pressure", "wbgt", "uvIndex", "battery"];
+const itemName = ["Temperature (℃)", "Humidity (％)", "Pressure (hPa)", "WBGT", "UV Index", "Battery (V)"];
+for (let i=0, l=itemID.length; i<l; i++){
+  const button = document.createElement("button");
+  button.textContent = itemName[i];
+  button.id = itemID[i];
+  button.addEventListener("click", itemBoxPressed);
+  Elements.id.itemBox.appendChild(button);
+}
+async function itemBoxPressed (event){
+  viewHistoryData(await ContentBridge.getWxHistory(), event.target.id);
+}
+
+function viewHistoryData (data, id){
+  const index = itemID.indexOf(id);
+  if (index === -1) return;
+  const datetimeFormat = new Intl.DateTimeFormat("ja-JP", { timeStyle: "medium" });
+  dataChart.data.labels = [];
+  dataChart.data.datasets[0].label = itemName[index];
+  dataChart.data.datasets[0].data = [];
+  const currentTime = Date.now();
+  for (const item of data){
+    if (currentTime - item.time > 86400000) continue;
+    const time = new Date(item.time);
+    dataChart.data.labels.push(datetimeFormat.format(time));
+    dataChart.data.datasets[0].data.push(Math.floor(1000 * item[id]) / 1000);
+  }
+  dataChart.update();
+}
+
+console.log(Elements.id.downloadData.addEventListener);
+
+Elements.id.allClear.addEventListener("click", () => {
+  const result = confirm("WxBeacon2の受信履歴を削除しますか？");
+  if (result) ContentBridge.clearHistory();
+});
+Elements.id.downloadData.addEventListener("click", async () => {
+  const blob = new Blob([JSON.stringify(await ContentBridge.getWxHistory())], { type: "application/json" });
+  const link = document.createElement("a");
+  link.download = "wxbeacon2-history.json";
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+
+(async () => {
+  viewHistoryData(await ContentBridge.getWxHistory(), "temperature");
+})();
+</script>
+</html>
