@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WxBeacon2 Viewer</title>
   <style>
+    @font-face {
+      font-family: "JF-Dot-Kappa-20-0213-Bold";
+      src: url("./JF-Dot-Kappa20-0213.woff2") format("woff2");
+    }
+
     body {
       margin: 0;
       -webkit-app-region: drag;
       user-select: none;
       background: #0000;
       color: #fff;
-      font-family: 'JF-Dot-Kappa-20-0213-Bold';
+      font-family: "JF-Dot-Kappa-20-0213-Bold", monospace;
     }
     .wxbeacon2 {
       box-sizing: border-box;
@@ -103,6 +108,7 @@ const Elements = {
   }
 };
 function writeData (data){
+
   Elements.id.temperature.textContent = data.temperature.toFixed(2);
   Elements.id.humidity.textContent = data.humidity.toFixed(2);
   Elements.id.pressure.textContent = data.pressure.toFixed(1);
