@@ -10,7 +10,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@abandonware/noble": "^1.9.2-26",
     "@stoprocent/noble": "^2.5.5",
     "electron": "^42.4.1",
     "electron-prompt": "^1.7.0"
