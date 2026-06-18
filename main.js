@@ -163,7 +163,7 @@ const MenuJSON = [
       {type:'separator'},
       {
         label: 'ラベルを変更',
-        CmdOrCtrl: 'CmdOrCtrl+T',
+        CmdOrCtrl: 'Ctrl+T',
         click: () => {
           Prompt({
             title: "ラベルを変更",
@@ -196,7 +196,7 @@ const MenuJSON = [
       },
       {
         label: '履歴を表示',
-        accelerator: 'CmdOrCtrl+H',
+        accelerator: 'Ctrl+H',
         click: () => { if (!historyWindow) createLogWindow(); }
       },
       {type:'separator'},
