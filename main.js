@@ -112,7 +112,8 @@ class WxBeacon2 {
         isPowerLowNotified = true;
       }
     });
-    return await characteristic.notifyAsync(true);
+
+    return await characteristic.subscribeAsync(true);
   }
 
   /** @param {Buffer | null} buffer  */
