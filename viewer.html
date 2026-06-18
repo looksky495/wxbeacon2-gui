@@ -108,6 +108,7 @@ const Elements = {
   }
 };
 function writeData (data){
+  if (!Object.hasOwn(data, "temperature")) return;
 
   Elements.id.temperature.textContent = data.temperature.toFixed(2);
   Elements.id.humidity.textContent = data.humidity.toFixed(2);
